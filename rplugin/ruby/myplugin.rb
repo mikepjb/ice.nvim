@@ -6,14 +6,9 @@ Neovim.plugin do |plug|
     nvim.current.line = str
   end
 
-  # Define a function called "Sum" which adds two numbers. This function is
-  # executed synchronously, so the result of the block will be returned to nvim.
-  plug.function(:Sum, :nargs => 2, :sync => true) do |nvim, x, y|
-    x + y
-  end
-
-  # Define an autocmd for the BufEnter event on Ruby files.
-  plug.autocmd(:BufEnter, :pattern => "*.rb") do |nvim|
-    nvim.command("echom 'Ruby file, eh?'")
-  end
+  # # Define a function called "Sum" which adds two numbers. This function is
+  # # executed synchronously, so the result of the block will be returned to nvim.
+  # plug.function(:Sum, :nargs => 2, :sync => true) do |nvim, x, y|
+  #   x + y
+  # end
 end
