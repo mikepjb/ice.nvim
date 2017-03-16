@@ -8,16 +8,11 @@ Neovim.plugin do |plug|
   end
 
   plug.command(:TestSend, :nargs => 0) do |nvim, str|
-    # socket.sendmsg 'd4:code11:(def s 345)2:id7:test-id2:op4:eval7:session7:test-ide'
-    socket.sendmsg 'd2:op5:clonee'
-    response = socket.recvmsg.first
-    nvim.current.line = "response : #{socket.recvmsg}"
+    nvim.current.line = "response : #{test_clone}"
   end
 
   plug.command(:TT, :nargs => 0) do |nvim, str|
-    decoded = test_send
-    nvim.current.line = "response: #{decoded}"
+    nvim.current.line = "response: #{test_send}"
     # nvim.message("response: #{decoded}")
-    # nvim.current.line = (nvim.methods - Object.methods).to_s
   end
 end
