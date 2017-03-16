@@ -10,7 +10,7 @@ def decode_message(response)
   next_length = nil
   response_array = []
 
-  response[1..-3].split(':').each do |message_part|
+  response[1..-2].split(':').each do |message_part|
     if next_length.nil?
       next_length = message_part.to_i
     else
@@ -35,3 +35,6 @@ session = decoded["new-session"]
 session_length = decoded["new-session"].length
 
 socket.sendmsg "d4:code11:(def s 666)2:id7:test-id2:op4:eval7:session#{session_length}:#{session}e"
+
+response = socket.recvmsg.first
+decoded = decode_message(response)
