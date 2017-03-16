@@ -1,8 +1,4 @@
-require 'socket'
-require_relative '../../lib/bencode'
-
-socket = TCPSocket.open('127.0.0.1', 9999)
-
+require_relative '../../lib/nrepl_client'
 
 Neovim.plugin do |plug|
   # Define a command called "SetLine" which sets the contents of the current
@@ -19,14 +15,7 @@ Neovim.plugin do |plug|
   end
 
   plug.command(:TT, :nargs => 0) do |nvim, str|
-    socket.sendmsg 'd2:op5:clonee'
-    response = socket.recvmsg.first
-    decoded = decode_message(response)
-    session = decoded["new-session"]
-    session_length = decoded["new-session"].length
-    socket.sendmsg "d4:code15:(def devil 777)2:id7:test-id2:op4:eval7:session#{session_length}:#{session}e"
-    response = socket.recvmsg.first
-    decoded = decode_message(response)
+    decoded = test_send
     nvim.current.line = "response: #{decoded}"
     # nvim.message("response: #{decoded}")
     # nvim.current.line = (nvim.methods - Object.methods).to_s
