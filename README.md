@@ -2,5 +2,5 @@
 
 Integrated Clojure Evaluator
 
-### This will fail if the ruby in your path does not have the 'neovim' gem
-how should this be addressed?
+### Issues
+    - :UpdateRemotePlugins will fail if you don't have ruby with access to the 'neovim' gem
