@@ -1,5 +1,5 @@
 module Bencode
-  def decode_message(response) # XXX Mike: unit test this
+  def decode(response)
     next_length = nil
     response_array = []
 
