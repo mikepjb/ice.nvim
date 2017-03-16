@@ -18,7 +18,7 @@ def test_send
   socket.sendmsg "d4:code15:(def devil 777)2:id7:test-id2:op4:eval7:session#{session_length}:#{session}e"
   response = socket.recvmsg.first
   decoded = Bencode::decode(response)
-  decoded
+  decoded["value"].gsub('"', '\"')
 end
 
 def send(code)
@@ -32,5 +32,5 @@ def send(code)
   socket.sendmsg "d4:code#{code.length}:#{code}2:id7:test-id2:op4:eval7:session#{session_length}:#{session}e"
   response = socket.recvmsg.first
   decoded = Bencode::decode(response)
-  decoded
+  decoded["value"].gsub('"', '\"')
 end
