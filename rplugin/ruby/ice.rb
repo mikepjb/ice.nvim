@@ -2,7 +2,7 @@ require 'socket'
 
 socket = TCPSocket.open('127.0.0.1', 9999)
 
-def decode_message(response)
+def decode_message(response) # XXX Mike: unit test this
   next_length = nil
   response_array = []
 
