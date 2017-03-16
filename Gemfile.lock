@@ -2,6 +2,9 @@ GEM
   remote: http://rubygems.org/
   specs:
     diff-lcs (1.2.5)
+    msgpack (1.1.0)
+    neovim (0.3.1)
+      msgpack (~> 1.0)
     rake (10.4.2)
     rspec (3.5.0)
       rspec-core (~> 3.5.0)
@@ -21,6 +24,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  neovim
   rake
   rspec
 
@@ -28,4 +32,4 @@ RUBY VERSION
    ruby 2.3.1p112
 
 BUNDLED WITH
-   1.13.6
+   1.14.4
