@@ -46,6 +46,6 @@ Neovim.plugin do |plug|
     socket.sendmsg "d4:code15:(def devil 666)2:id7:test-id2:op4:eval7:session#{session_length}:#{session}e"
     response = socket.recvmsg.first
     decoded = decode_message(response)
-    nvim.current.line("response: #{decoded}")
+    nvim.current.line = "response: #{decoded}"
   end
 end
