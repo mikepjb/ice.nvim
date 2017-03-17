@@ -18,25 +18,8 @@ Neovim.plugin do |plug|
   # plug.command(:Eval, :nargs => '?') do |nvim, args|
   # XXX can you collect all args like &args or similar?
   plug.command(:Eval, :nargs => '?', :range => true) do |nvim, arg1, arg2|
-    # parse_command_arguments => collect_payload/code
-    # nvim.current.line = "args: #{args}"
-    # All from line 1
-    # '<,'>Eval on single line == arg1: 1, arg2: 1
-    # Eval (def hello 345) == arg1: (def hello 345), arg2: 1
-    # .,.+1Eval == arg1: 1, arg2: 2
-
     code = parse_command_arguments(nvim, arg1, arg2)
-    nvim.command("echo \"#{code}\"")
-    # nvim.current.line = "code: #{options}"
-
-    # nvim.current.line = "arg1: #{arg1}, arg2: #{arg2}"
-
-    # if args.nil?
-    #   nvim.command("echo \"#{test_send}\"")
-    # else
-    #   # XXX doesn't work the first time if there is a space in args?!?
-    #   nvim.command("echo \"#{send(args)}\"")
-    # end
+    nvim.command("echo \"#{send(code)}\"")
   end
 
   plug.command(:Methods, :nargs => 0) do |nvim, args|
