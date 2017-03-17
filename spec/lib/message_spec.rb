@@ -25,7 +25,16 @@ describe Message do
       )
     end
 
-    xit 'works for where a filepath has src or test' do
+    it 'converts _ to - in the namespace' do
+      expect(prefix_namespace('test/clj/water_marker/core_test.clj')).to eq(
+        '(ns water-marker.core-test)'
+      )
+    end
+
+    it 'works for where a filepath has src or test' do
+      expect(prefix_namespace('test/clj/watermarker/atest.clj')).to eq(
+        '(ns watermarker.atest)'
+      )
     end
 
     xit 'avoids prefixing a namespace altogether if src/test are not found on the filepath' do
