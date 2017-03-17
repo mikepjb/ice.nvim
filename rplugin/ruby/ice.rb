@@ -22,9 +22,8 @@ Neovim.plugin do |plug|
     nvim.command("echo \"#{send(code)}\"")
   end
 
-  plug.command(:Methods, :nargs => 0) do |nvim, args|
-    nvim.current.line = "methods: #{nvim.methods}"
-    # nvim.current.line = "methods: #{nvim.get_current_buffer.methods}"
+  plug.command(:RunTests, :nargs => 0) do |nvim, args|
+    nvim.command("echom \"#{run_tests}\"")
   end
 
   plug.command(:TT, :nargs => '?') do |nvim, args|
