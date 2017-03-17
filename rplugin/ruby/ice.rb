@@ -24,9 +24,8 @@ Neovim.plugin do |plug|
   plug.command(:Eval, :nargs => '?', :range => true) do |nvim, *args|
     include Message
     code = parse_command_arguments(nvim, args)
-    # XXX I want to avoid including namespace where the path doesn't contain 'src/test or similar'
-    # or perhaps when home is one level down from the clj file?
     filename = nvim.get_current_buffer.name
+    # XXX namespace does not appear to be prefixed in the watermarker.core.clj file
     code_with_ns = "#{prefix_namespace(filename, code)}"
     nvim.command("echom \"#{send(code_with_ns)}\"")
   end
