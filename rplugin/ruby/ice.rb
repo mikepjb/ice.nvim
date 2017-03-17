@@ -1,11 +1,11 @@
 require_relative '../../lib/nrepl_client'
 
-def parse_command_arguments(nvim, arg1, arg2)
+def parse_command_arguments(nvim, args) # extract and unit test this
   code_to_evaluate = []
-  if arg1.to_i == 0
-    code_to_evaluate << arg1
+  if args.length == 3
+    code_to_evaluate << args[0]
   else
-    (arg1.to_i..arg2.to_i).each do |line_number|
+    (args[0].to_i..args[1].to_i).each do |line_number|
       code_to_evaluate << nvim.get_current_buffer.get_line(line_number - 1)
     end
   end
@@ -15,10 +15,10 @@ end
 Neovim.plugin do |plug|
   # XXX E116: Invalid arguments for function remote#define#CommandBootstrap where quotes are used "
   # XXX note that this error does not occur after the first Eval without " occurs, then including " is fine?!?
-  # plug.command(:Eval, :nargs => '?') do |nvim, args|
+  # XXX Also note that this error ONLY occurs when passed in to Eval as 
   # XXX can you collect all args like &args or similar?
-  plug.command(:Eval, :nargs => '?', :range => true) do |nvim, arg1, arg2|
-    code = parse_command_arguments(nvim, arg1, arg2)
+  plug.command(:Eval, :nargs => '?', :range => true) do |nvim, *args|
+    code = parse_command_arguments(nvim, args)
     nvim.command("echo \"#{send(code)}\"")
   end
 
