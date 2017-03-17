@@ -1,6 +1,6 @@
 module Message
   def prefix_namespace(filename, code)
-    if filename =~ /^(src|test)/
+    if filename =~ /.?(src|test)\/.*/
       namespace = filename.
         split(/(src|test)\//).
         last.

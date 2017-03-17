@@ -44,6 +44,25 @@ describe Message do
         "x"
       )
     end
+
+    it 'inserts a namespace when src/test are in the middle of a filename' do
+      function =
+        "(defn serve-content [filetype content]"\
+        "{:status  200"\
+        ":headers {\"Content-Type\" filetype}"\
+        ":body    content})"
+      expect(prefix_namespace(
+        "/home/somebody/code/watermarker/src/watermarker/core.clj", function
+      )).to eq(
+        "(ns watermarker.core)"\
+        "\n"\
+        "\n"\
+        "(defn serve-content [filetype content]"\
+        "{:status  200"\
+        ":headers {\"Content-Type\" filetype}"\
+        ":body    content})"
+      )
+    end
   end
 end
 # 'src/clj/sbsl/price_services/schema/deals.clj'
