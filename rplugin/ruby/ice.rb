@@ -1,4 +1,5 @@
 require_relative '../../lib/nrepl_client'
+require_relative '../../lib/message'
 
 def parse_command_arguments(nvim, args) # extract and unit test this
   code_to_evaluate = []
@@ -12,20 +13,32 @@ def parse_command_arguments(nvim, args) # extract and unit test this
   code_to_evaluate.join("\n")
 end
 
+# XXX extract namespace method
+# XXX test against src/clj or cljs folders
+
 Neovim.plugin do |plug|
   # XXX E116: Invalid arguments for function remote#define#CommandBootstrap where quotes are used "
   # XXX note that this error does not occur after the first Eval without " occurs, then including " is fine?!?
   # XXX Also note that this error ONLY occurs when passed in to Eval as 
   # XXX can you collect all args like &args or similar?
   plug.command(:Eval, :nargs => '?', :range => true) do |nvim, *args|
+    include Message
     code = parse_command_arguments(nvim, args)
-    nvim.command("echo \"#{send(code)}\"")
+    # XXX I want to avoid including namespace where the path doesn't contain 'src/test or similar'
+    # or perhaps when home is one level down from the clj file?
+    filename = nvim.get_current_buffer.name
+    code_with_ns = "#{prefix_namespace(filename)}\n#{code}"
+    nvim.command("echom \"#{send(code_with_ns)}\"")
   end
 
   plug.command(:RunTests, :nargs => 0) do |nvim, args|
     nvim.command("echom \"#{run_tests}\"")
   end
 
+  plug.command(:Methods, :nargs => 0) do |nvim, args|
+    # nvim.current.line = "methods: #{nvim.methods}"
+    nvim.current.line = "methods: #{nvim.get_current_buffer.methods}"
+  end
   plug.command(:TT, :nargs => '?') do |nvim, args|
     nvim.current.line = "response: #{test_send}"
   end
