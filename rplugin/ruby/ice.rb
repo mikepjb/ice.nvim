@@ -23,17 +23,8 @@ Neovim.plugin do |plug|
   end
 
   plug.command(:Methods, :nargs => 0) do |nvim, args|
-    # nvim.current.line = "methods: #{nvim.methods}"
-    nvim.current.line = "methods: #{nvim.get_current_buffer.methods}"
-  end
-
-  plug.command(:GetLine, :nargs => 0) do |nvim, args|
-    # nvim.current.line = "methods: #{nvim.methods}"
-    nvim.current.line = "line: #{nvim.get_current_buffer.get_line(1)}"
-  end
-
-  plug.command(:Str, :nargs => '?') do |nvim, args|
-    nvim.command "echo \"#{args}\""
+    nvim.current.line = "methods: #{nvim.methods}"
+    # nvim.current.line = "methods: #{nvim.get_current_buffer.methods}"
   end
 
   plug.command(:TT, :nargs => '?') do |nvim, args|
