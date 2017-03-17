@@ -34,5 +34,9 @@ def send(code)
   socket.sendmsg "d4:code#{code.length}:#{code}2:id7:test-id2:op4:eval7:session#{session_length}:#{session}e"
   response = socket.recvmsg.first
   decoded = Bencode::decode(response)
-  decoded["value"].gsub('"', '\"')
+  if decoded.has_key?("value")
+    decoded["value"].gsub('"', '\"')
+  else
+    decoded.to_s.gsub('"', '\"')
+  end
 end
