@@ -13,6 +13,12 @@ def parse_command_arguments(nvim, args) # extract and unit test this
   code_to_evaluate.join("\n")
 end
 
+class Neovim::Client
+  def echo(message)
+    command("echom \"#{message}\"")
+  end
+end
+
 # XXX extract namespace method
 # XXX test against src/clj or cljs folders
 
@@ -25,9 +31,8 @@ Neovim.plugin do |plug|
     include Message
     code = parse_command_arguments(nvim, args)
     filename = nvim.get_current_buffer.name
-    # XXX namespace does not appear to be prefixed in the watermarker.core.clj file
-    code_with_ns = "#{prefix_namespace(filename, code)}"
-    nvim.command("echom \"#{send(code_with_ns)}\"")
+    code_with_ns = prefix_namespace(filename, code)
+    nvim.echo(send(code_with_ns))
   end
 
   plug.command(:RunTests, :nargs => 0) do |nvim, args|
