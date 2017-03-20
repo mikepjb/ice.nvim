@@ -19,8 +19,7 @@ class Neovim::Client
   end
 end
 
-# XXX extract namespace method
-# XXX test against src/clj or cljs folders
+@received_messages = ["one", "two"]
 
 Neovim.plugin do |plug|
   # XXX E116: Invalid arguments for function remote#define#CommandBootstrap where quotes are used "
@@ -32,18 +31,20 @@ Neovim.plugin do |plug|
     code = parse_command_arguments(nvim, args)
     filename = nvim.get_current_buffer.name
     code_with_ns = prefix_namespace(filename, code)
-    nvim.echo(send(code_with_ns))
+    nvim.echo(send(code_with_ns, @received_messages))
   end
 
   plug.command(:RunTests, :nargs => 0) do |nvim, args|
-    nvim.command("echom \"#{run_tests}\"")
+    nvim.echo(run_tests)
+  end
+
+  plug.command(:Log, :nargs => 0) do |nvim, args|
+    # raise "#{@received_messages}"
+    nvim.current.line = "logs: #{@received_messages}"
   end
 
   plug.command(:Methods, :nargs => 0) do |nvim, args|
     # nvim.current.line = "methods: #{nvim.methods}"
     nvim.current.line = "methods: #{nvim.get_current_buffer.methods}"
-  end
-  plug.command(:TT, :nargs => '?') do |nvim, args|
-    nvim.current.line = "response: #{test_send}"
   end
 end

@@ -30,4 +30,9 @@ describe Bencode do
       "5:value17:#'boot.user/devile"
     )
   end
+
+
+  # XXX there are two d/e dictionaries here and we do not currently account for this.
+  this_breaks_in_bencode = 
+    "d2:id7:test-id2:ns16:watermarker.core7:session36:57fea508-bc66-42af-b167-a3469da03ec35:value30:#'watermarker.core/this-methoded2:id7:test-id7:session36:57fea508-bc66-42af-b167-a3469da03ec36:statusl4:doneee"
 end

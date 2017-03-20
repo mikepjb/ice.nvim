@@ -1,40 +1,34 @@
 require 'socket'
+require_relative 'lib/bencode'
+require_relative 'lib/nrepl_client'
 
-socket = TCPSocket.open('127.0.0.1', 9999)
+include Bencode
 
-socket.sendmsg 'd2:op5:clonee'
-# socket.methods - Object.methods
-response = socket.recvmsg.first
+clojure_namespaced_method =
+  "(ns watermarker.core)"\
+  "\n"\
+  "(defn this-method [x]"\
+  "   (+ 37 77 x))"\
 
-def decode_message(response)
-  next_length = nil
-  response_array = []
+socket = send(clojure_namespaced_method)
 
-  response[1..-2].split(':').each do |message_part|
-    if next_length.nil?
-      next_length = message_part.to_i
-    else
-      payload = message_part[0..(next_length - 1)]
-      response_array << payload
-      next_meta = message_part[next_length..-1]
-      if next_meta =~ /^[0-9].*/
-        next_length = next_meta.to_i
-      else
-        next_length = next_meta[1..-1].to_i
-      end
-    end
+@messages = []
+
+# while next_message = socket.recvmsg_nonblock
+while true
+  begin
+    next_message = socket.recvmsg_nonblock
+    @messages << decode(next_message.first)
+  rescue
   end
-  Hash[*response_array]
+  # puts @messages
 end
 
-decoded = decode_message(response)
+# puts "first"
+# puts decode(socket.recvmsg.first)
+# puts "second"
+# second_message = socket.recv # msg.first
+# puts second_message
+# puts decode(socket.recvmsg.first)
 
-puts decoded
-
-session = decoded["new-session"]
-session_length = decoded["new-session"].length
-
-socket.sendmsg "d4:code11:(def s 666)2:id7:test-id2:op4:eval7:session#{session_length}:#{session}e"
-
-response = socket.recvmsg.first
-decoded = decode_message(response)
+# puts socket.methods - Object.methods
