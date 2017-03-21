@@ -20,6 +20,15 @@ module Bencode
     Hash[*response_array]
   end
 
+  def decode_all(response)
+    # Sometimes nrepl will pass multiple dictionaries in the same message
+    response[0..-2].
+      split(/(^|e)d2:/).
+      reject { |x| x.empty? || x == 'e' }.
+      map.with_index { |x, index| "d2:#{x}#{'e' if index == 0 }" }.
+      map { |x| decode(x) }
+  end
+
   def encode(message)
     encoded_message = 'd'
     message.to_a.flatten.each do |message_part|

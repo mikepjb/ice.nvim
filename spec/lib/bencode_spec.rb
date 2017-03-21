@@ -31,8 +31,37 @@ describe Bencode do
     )
   end
 
+  it 'can decode multiple dictionaries from a single socket message' do
+    multi_dict_message =
+      "d"\
+      "2:id7:test-id"\
+      "2:ns16:watermarker.core"\
+      "7:session36:57fea508-bc66-42af-b167-a3469da03ec"\
+      "35:value30:#'watermarker.core/this-method"\
+    "e"\
+      "d"\
+      "2:id7:test-id"\
+      "7:session36:57fea508-bc66-42af-b167-a3469da03ec"\
+      "36:statusl4:done"\
+      "e"\
+      "e"
+    expect(decode_all(multi_dict_message)).to eq(
+      [{"id"=>"test-id", "ns"=>"watermarker.core", "session"=>"57fea508-bc66-42af-b167-a3469da03ec3", "value"=>"#'watermarker.core/this-method"},
+       {"id"=>"test-id", "session"=>"57fea508-bc66-42af-b167-a3469da03ec3", "status"=>"done"}]
+    )
+  end
 
-  # XXX there are two d/e dictionaries here and we do not currently account for this.
-  this_breaks_in_bencode = 
-    "d2:id7:test-id2:ns16:watermarker.core7:session36:57fea508-bc66-42af-b167-a3469da03ec35:value30:#'watermarker.core/this-methoded2:id7:test-id7:session36:57fea508-bc66-42af-b167-a3469da03ec36:statusl4:doneee"
+  it 'can decode single dictionaries from a single socket message' do
+    single_dict_message =
+      "d2:id7:test-id"\
+      "2:ns9:boot.user"\
+      "7:session36:a647fb12-54ae-4313-8358-1161810de8f3"\
+      "5:value17:#'boot.user/devile"
+    expect(decode_all(single_dict_message)).to eq(
+      [{"id" => "test-id",
+        "ns" => "boot.user",
+        "session" => "a647fb12-54ae-4313-8358-1161810de8f3",
+        "value" => "#'boot.user/devil"}]
+    )
+  end
 end
