@@ -64,4 +64,33 @@ describe Bencode do
         "value" => "#'boot.user/devil"}]
     )
   end
+
+  context "Exception messages" do
+    it 'can decode the initial exception message' do
+      exception_message =
+        "d"\
+        "2:ex45:class clojure.lang.Compiler$CompilerException"\
+        "2:id7:test-id"\
+        "7:root-ex45:class clojure.lang.Compiler$CompilerException"\
+        "7:session36:b9336d5c-abde-4dc3-b555-86628e3d26d6"\
+        "6:statusl10:eval-erroree"
+      expect(decode_all(exception_message)).to eq(
+        [{"ex" => "class clojure.lang.Compiler$CompilerException",
+          "id" => "test-id",
+          "root-ex" => "class clojure.lang.Compiler$CompilerException",
+          "session" => "b9336d5c-abde-4dc3-b555-86628e3d26d6",
+          "status" => "eval-error"}]
+      )
+    end
+
+    # XXX sadly I think splitting on : is breaking the value from the out key
+    it 'can decode the more detailed exception message' do
+      detailed_exception_message =
+        "d"\
+        "2:id7:test-id"\
+        "3:out244:             \e[1;31mjava.lang.RuntimeException\e[m: \e[3mNo such namespace: io\e[m\n\e[1;31mclojure.lang.Compiler$CompilerException\e[m: \e[3mjava.lang.RuntimeException: No such namespace: io, compiling:(/tmp/boot.user6662229202639790268.clj:2:86)\e[m\n"\
+        "7:session36:b9336d5c-abde-4dc3-b555-86628e3d26d6"
+      expect(decode_all(detailed_exception_message)).to eq('nice')
+    end
+  end
 end
