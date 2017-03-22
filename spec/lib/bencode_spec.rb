@@ -90,7 +90,7 @@ describe Bencode do
         "2:id7:test-id"\
         "3:out244:             \e[1;31mjava.lang.RuntimeException\e[m: \e[3mNo such namespace: io\e[m\n\e[1;31mclojure.lang.Compiler$CompilerException\e[m: \e[3mjava.lang.RuntimeException: No such namespace: io, compiling:(/tmp/boot.user6662229202639790268.clj:2:86)\e[m\n"\
         "7:session36:b9336d5c-abde-4dc3-b555-86628e3d26d6"
-      expect(decode_all(detailed_exception_message)).to eq('nice')
+      expect(no_colon_decode_all(detailed_exception_message).first).to eq('nice')
     end
   end
 end

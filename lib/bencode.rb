@@ -42,6 +42,23 @@ module Bencode
       map { |x| decode(x) }
   end
 
+  def no_colon_decode(response)
+    current, remaining = [response[0], response[1..-1]]
+    if current == 'd' # we are dealing with a dictionary
+      length, remaining = remaining.split(':', 2)
+      # XXX wip here key, remaining = remaining[
+    end
+  end
+
+  def no_colon_decode_all(response)
+    # Sometimes nrepl will pass multiple dictionaries in the same message
+    response[0..-2].
+      split(/(^|e)d2:/).
+      reject { |x| x.empty? || x == 'e' }.
+      map.with_index { |x, index| "d2:#{x}#{'e' if index == 0 }" }.
+      map { |x| no_colon_decode(x) }
+  end
+
   def encode(message)
     encoded_message = 'd'
     message.to_a.flatten.each do |message_part|
