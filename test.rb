@@ -47,6 +47,7 @@ catch (:complete) do
     message = socket.recvmsg.first
     # XXX probs [] for nil is in decoding...
     raw(message).each do |mess|
+      p 'new message'
       p mess.to_s
       throw :complete if mess.to_s.include?('done')
     end

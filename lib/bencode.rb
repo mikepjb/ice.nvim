@@ -8,7 +8,6 @@ module Bencode
         next_length = message_part.to_i
       else
         payload = message_part[0..(next_length - 1)]
-        puts payload
         response_array << payload
         next_meta = message_part[next_length..-1]
         if next_meta =~ /^[0-9].*/
@@ -19,7 +18,6 @@ module Bencode
           next if next_meta == 'e' || next_meta.nil?
           next_length = next_meta[1..-1].to_i
         end
-        puts next_length
       end
     end
     Hash[*response_array]
@@ -42,17 +40,41 @@ module Bencode
       map { |x| decode(x) }
   end
 
+  def extract_next_keypair(output, response)
+    puts "response #{response}"
+    remaining = response
+    length, remaining = remaining.split(':', 2)
+    length = length.to_i
+    # puts "remaining: #{remaining}"
+    # puts "length: #{length}"
+    key, remaining = [remaining[0..(length-1)], remaining[length..-1]]
+    length, remaining = remaining.split(':', 2)
+    length = length.to_i
+    # puts "remaining: #{remaining}"
+    # puts "length: #{length}"
+    value, remaining = [remaining[0..(length-1)], remaining[length..-1]]
+    output[key] = value
+    [output, remaining]
+  end
+
   def no_colon_decode(response)
+    output = {}
+    puts "END: #{response[-1]}"
     current, remaining = [response[0], response[1..-1]]
     if current == 'd' # we are dealing with a dictionary
-      length, remaining = remaining.split(':', 2)
-      # XXX wip here key, remaining = remaining[
+      while remaining = 'e' # !remaining.empty?
+        output, remaining = extract_next_keypair(output, remaining)
+        puts "remaining #{remaining}"
+        puts "equal #{remaining == 'e'}"
+      end
+      output
     end
   end
 
   def no_colon_decode_all(response)
     # Sometimes nrepl will pass multiple dictionaries in the same message
-    response[0..-2].
+    puts "END: #{response[-1]}"
+    response[0..-1].
       split(/(^|e)d2:/).
       reject { |x| x.empty? || x == 'e' }.
       map.with_index { |x, index| "d2:#{x}#{'e' if index == 0 }" }.
