@@ -57,11 +57,11 @@ describe Bencode do
       "2:ns9:boot.user"\
       "7:session36:a647fb12-54ae-4313-8358-1161810de8f3"\
       "5:value17:#'boot.user/devile"
-    expect(no_colon_decode_all(single_dict_message)).to eq(
-      [{"id" => "test-id",
+    expect(no_colon_decode(single_dict_message)).to eq(
+      {"id" => "test-id",
         "ns" => "boot.user",
         "session" => "a647fb12-54ae-4313-8358-1161810de8f3",
-        "value" => "#'boot.user/devil"}]
+        "value" => "#'boot.user/devil"}
     )
   end
 
@@ -74,7 +74,7 @@ describe Bencode do
         "7:root-ex45:class clojure.lang.Compiler$CompilerException"\
         "7:session36:b9336d5c-abde-4dc3-b555-86628e3d26d6"\
         "6:statusl10:eval-erroree"
-      expect(decode_all(exception_message)).to eq(
+      expect(no_colon_decode(exception_message)).to eq(
         [{"ex" => "class clojure.lang.Compiler$CompilerException",
           "id" => "test-id",
           "root-ex" => "class clojure.lang.Compiler$CompilerException",
@@ -83,19 +83,29 @@ describe Bencode do
       )
     end
 
-    # XXX sadly I think splitting on : is breaking the value from the out key
-    # problem is this was taken from raw( which does magic
     it 'can decode the more detailed exception message' do
       detailed_exception_message =
         "d"\
         "2:id7:test-id"\
         "3:out244:             \e[1;31mjava.lang.RuntimeException\e[m: \e[3mNo such namespace: io\e[m\n\e[1;31mclojure.lang.Compiler$CompilerException\e[m: \e[3mjava.lang.RuntimeException: No such namespace: io, compiling:(/tmp/boot.user6662229202639790268.clj:2:86)\e[m\n"\
-        "7:session36:b9336d5c-abde-4dc3-b555-86628e3d26d6"
-      expect(no_colon_decode_all(detailed_exception_message)).to eq(
-        [{"id" => "test-id",
+        "7:session36:b9336d5c-abde-4dc3-b555-86628e3d26d6"\
+        "e"
+      expect(no_colon_decode(detailed_exception_message)).to eq(
+        {"id" => "test-id",
          "out" => "             \e[1;31mjava.lang.RuntimeException\e[m: \e[3mNo such namespace: io\e[m\n\e[1;31mclojure.lang.Compiler$CompilerException\e[m: \e[3mjava.lang.RuntimeException: No such namespace: io, compiling:(/tmp/boot.user6662229202639790268.clj:2:86)\e[m\n",
-         "session" => "b9336d5c-abde-4dc3-b555-86628e3d26d6"}]
+         "session" => "b9336d5c-abde-4dc3-b555-86628e3d26d6"}
       )
+
+"d2:id7:test-id3:out288:             \e[1;31mjava.lang.RuntimeException\e[m: \e[3mNo such namespace: io\e[m\n\e[1;31mclojure.lang.Compiler$CompilerException\e[m: \e[3mjava.lang.RuntimeException: No such namespace: io, compiling:(/var/folders/bq/8tjlf2qn0knf42k8pv_zm5wc0000gq/T/boot.user6177609928739914356.clj:2:86)\e[m\n7:session36:4151744c-870e-4978-b22b-7550a1c05c17e"
     end
+  end
+
+  it 'extracts the next keypair in sequence' do
+    expect(
+      extract_next_keypair({"cool" => "keypair"},
+                           "7:session36:b9336d5c-abde-4dc3-b555-86628e3d26d6e")
+    ).to eq(
+      [{"cool"=>"keypair", "session"=>"b9336d5c-abde-4dc3-b555-86628e3d26d6"}, "e"]
+    )
   end
 end

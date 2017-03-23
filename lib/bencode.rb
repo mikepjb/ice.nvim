@@ -23,14 +23,6 @@ module Bencode
     Hash[*response_array]
   end
 
-  # XXX test method - remove after speccing out error response messages
-  def raw(response)
-    response[0..-2].
-      split(/(^|e)d2:/).
-      reject { |x| x.empty? || x == 'e' }.
-      map.with_index { |x, index| "d2:#{x}#{'e' if index == 0 }" }
-  end
-
   def decode_all(response)
     # Sometimes nrepl will pass multiple dictionaries in the same message
     response[0..-2].
@@ -41,17 +33,19 @@ module Bencode
   end
 
   def extract_next_keypair(output, response)
-    puts "response #{response}"
+    # 7:session36:b9336d5c-abde-4dc3-b555-86628e3d26d6e
     remaining = response
+    puts "INRESPONSE #{response}"
+    puts "WHAT #{remaining.split(':',2)}"
+    puts "exp #{remaining.split(':',2)[1][0..6]}"
     length, remaining = remaining.split(':', 2)
     length = length.to_i
-    # puts "remaining: #{remaining}"
-    # puts "length: #{length}"
+    # failing on this line, can't for the life of me see where [] is called on a nil
+    puts "LEN: '#{length}'" # next lines are failing when remaining is an empty string
+    puts "REM: '#{remaining}'" # next lines are failing when remaining is an empty string
     key, remaining = [remaining[0..(length-1)], remaining[length..-1]]
     length, remaining = remaining.split(':', 2)
     length = length.to_i
-    # puts "remaining: #{remaining}"
-    # puts "length: #{length}"
     value, remaining = [remaining[0..(length-1)], remaining[length..-1]]
     output[key] = value
     [output, remaining]
@@ -59,13 +53,11 @@ module Bencode
 
   def no_colon_decode(response)
     output = {}
-    puts "END: #{response[-1]}"
     current, remaining = [response[0], response[1..-1]]
     if current == 'd' # we are dealing with a dictionary
-      while remaining = 'e' # !remaining.empty?
+      while remaining != 'e' # !remaining.empty? # remaining = 'e' # !remaining.empty?
+        puts "we are sending: #{remaining}"
         output, remaining = extract_next_keypair(output, remaining)
-        puts "remaining #{remaining}"
-        puts "equal #{remaining == 'e'}"
       end
       output
     end
@@ -73,7 +65,9 @@ module Bencode
 
   def no_colon_decode_all(response)
     # Sometimes nrepl will pass multiple dictionaries in the same message
-    puts "END: #{response[-1]}"
+    # This should not take single messages, no_colon_decode does that the
+    # reason for this is that this method does funky stuff fixing dict
+    # format for bencode decoding before delegating to no_colon_decode
     response[0..-1].
       split(/(^|e)d2:/).
       reject { |x| x.empty? || x == 'e' }.

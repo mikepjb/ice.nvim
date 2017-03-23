@@ -46,16 +46,14 @@ catch (:complete) do
   while true
     message = socket.recvmsg.first
     # XXX probs [] for nil is in decoding...
-    raw(message).each do |mess|
-      p 'new message'
-      p mess.to_s
-      throw :complete if mess.to_s.include?('done')
-    end
-    # decode_all(message).each do |dict|
-    #   log << dict
-    #   throw :complete if dict['status'] == 'done'
-    # end
+    p 'dat message'
+    p message.to_s
+    throw :complete if message.to_s.include?('done')
   end
+  # decode_all(message).each do |dict|
+  #   log << dict
+  #   throw :complete if dict['status'] == 'done'
+  # end
 end
 
 puts log
