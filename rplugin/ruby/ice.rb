@@ -13,12 +13,6 @@ def parse_command_arguments(nvim, args) # extract and unit test this
   code_to_evaluate.join("\n")
 end
 
-class Neovim::Client
-  def echo(message)
-    command("echom \"#{message}\"")
-  end
-end
-
 @received_messages = []
 
 Neovim.plugin do |plug|

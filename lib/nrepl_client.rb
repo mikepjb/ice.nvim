@@ -1,7 +1,14 @@
 require 'socket'
+require 'neovim'
 require_relative 'bencode'
 
 module NreplClient
+  class Neovim::Client
+    def echo(message)
+      command("echom \"#{message}\"")
+    end
+  end
+
   def session(socket, log=[])
     socket.sendmsg 'd2:op5:clonee'
     response = socket.recvmsg.first
