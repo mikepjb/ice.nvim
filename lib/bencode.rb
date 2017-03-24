@@ -1,5 +1,5 @@
 module Bencode
-  def extract_next_keypair(output, response)
+  def self.extract_next_keypair(output, response)
     # 7:session36:b9336d5c-abde-4dc3-b555-86628e3d26d6e
     remaining = response
     length, remaining = remaining.split(':', 2)
@@ -17,7 +17,7 @@ module Bencode
     [output, remaining]
   end
 
-  def decode(response)
+  def self.decode(response)
     output = {}
     current, remaining = [response[0], response[1..-1]]
     if current == 'd' # we are dealing with a dictionary
@@ -28,7 +28,7 @@ module Bencode
     end
   end
 
-  def decode_all(response)
+  def self.decode_all(response)
     # Sometimes nrepl will pass multiple dictionaries in the same message
     # This should not take single messages, no_colon_decode does that the
     # reason for this is that this method does funky stuff fixing dict
@@ -40,7 +40,7 @@ module Bencode
       map { |x| decode(x) }
   end
 
-  def encode(message)
+  def self.encode(message)
     encoded_message = 'd'
     message.to_a.flatten.each do |message_part|
       encoded_message << "#{message_part.length}:#{message_part}"

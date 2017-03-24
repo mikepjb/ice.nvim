@@ -28,7 +28,7 @@ module NreplClient
     catch (:complete) do
       while true
         message = socket.recvmsg.first
-        decode_all(message).each do |dict|
+        Bencode::decode_all(message).each do |dict|
           log << dict
           throw :complete if dict['status'] == 'done'
         end

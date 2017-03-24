@@ -1,43 +1,21 @@
 require 'neovim'
-require_relative '../../lib/nrepl_client'
 require_relative '../../lib/neovim_client'
-require_relative '../../lib/message'
 
 @received_messages = []
 
 Neovim.plugin do |plug|
-  # XXX E116: Invalid arguments for function remote#define#CommandBootstrap where quotes are used "
-  # XXX note that this error does not occur after the first Eval without " occurs, then including " is fine?!?
-  # XXX Also note that this error ONLY occurs when passed in to Eval as 
   plug.command(:Eval, :nargs => '?', :range => true) do |nvim, *args|
-    include Message
-    include NreplClient
-    include NeovimClient
-    code = parse_command_arguments(nvim, args)
-    filename = nvim.get_current_buffer.name
-    code_with_ns = prefix_namespace(filename, code)
-    send(code_with_ns, @received_messages, nvim)
-
-    catch (:complete) do
-      @received_messages.reverse.each do |x|
-        if x.has_key?('value')
-          if !x['value'].empty?
-            nvim.echo(x['value'].gsub('"', '\"'))
-            throw :complete
-          end
-        end
-      end
-    end
+    NeovimClient::eval(nvim, args, @received_messages)
   end
 
-  plug.command(:RunTests, :nargs => 0) do |nvim, args|
+  plug.command(:RunTests, :nargs => 0) do |nvim|
     nvim.echo(run_tests)
   end
 
-  plug.command(:Log, :nargs => 0) do |nvim, args|
+  plug.command(:Log, :nargs => 0) do |nvim|
     nvim.current.line = "logs: #{@received_messages}"
   end
 
-  # XXX command :StackTrace - show the last stacktrace in @received_messages
-  # XXX  - :Require should use the load-file op - or maybe eval (load-file "currentfile")
+  # XXX :StackTrace - show the last stacktrace in @received_messages
+  # XXX :Require should use the load-file op - or maybe eval (load-file "currentfile")
 end

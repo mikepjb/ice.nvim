@@ -1,4 +1,9 @@
 require 'neovim'
+require_relative 'nrepl_client'
+require_relative 'message'
+
+include NreplClient
+include Message
 
 module NeovimClient
   class Neovim::Client
@@ -7,7 +12,7 @@ module NeovimClient
     end
   end
 
-  def parse_command_arguments(nvim, args) # extract and unit test this
+  def self.parse_command_arguments(nvim, args) # unit test this
     code_to_evaluate = []
     if args.length == 3
       code_to_evaluate << args[0]
@@ -17,5 +22,23 @@ module NeovimClient
       end
     end
     code_to_evaluate.join("\n")
+  end
+
+  def self.eval(nvim, args, log=[])
+    code = parse_command_arguments(nvim, args)
+    filename = nvim.get_current_buffer.name
+    code_with_ns = Message::prefix_namespace(filename, code)
+    send(code_with_ns, log, nvim)
+
+    catch (:complete) do
+      log.reverse.each do |x|
+        if x.has_key?('value')
+          if !x['value'].empty?
+            nvim.echo(x['value'].gsub('"', '\"'))
+            throw :complete
+          end
+        end
+      end
+    end
   end
 end
