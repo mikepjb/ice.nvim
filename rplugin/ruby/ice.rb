@@ -43,6 +43,7 @@ Neovim.plugin do |plug|
   # XXX Also note that this error ONLY occurs when passed in to Eval as 
   plug.command(:Eval, :nargs => '?', :range => true) do |nvim, *args|
     include Message
+    include NreplClient
     code = parse_command_arguments(nvim, args)
     filename = nvim.get_current_buffer.name
     code_with_ns = prefix_namespace(filename, code)
