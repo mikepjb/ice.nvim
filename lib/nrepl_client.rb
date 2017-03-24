@@ -39,18 +39,6 @@ def send(code, log=[])
   end
 end
 
-def run_tests
-  # XXX doesn't pick up tests
-  include Bencode
-  socket = TCPSocket.open('127.0.0.1', 9999)
-  socket.sendmsg 'd2:op5:clonee'
-  response = socket.recvmsg.first
-  decoded = Bencode::decode(response)
-  session = decoded["new-session"]
-  session_length = decoded["new-session"].length
-  socket.sendmsg "d4:code24:(clojure.test/run-tests)2:id7:test-id2:op4:eval7:session#{session_length}:#{session}e"
-  socket.recvmsg # Run the first time, ignore the 'started' message
-  response = socket.recvmsg.first
-  decoded = Bencode::decode(response)
-  decoded["out"].to_s.gsub('"', '\"')
+def run_tests(log=[])
+  send("(clojure.test/run-tests)", log)
 end
