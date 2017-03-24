@@ -1,11 +1,11 @@
 require 'neovim'
 require_relative '../../lib/neovim_client'
 
-@received_messages = []
+@log = []
 
 Neovim.plugin do |plug|
   plug.command(:Eval, :nargs => '?', :range => true) do |nvim, *args|
-    NeovimClient::eval(nvim, args, @received_messages)
+    NeovimClient::eval(nvim, args, @log)
   end
 
   plug.command(:RunTests, :nargs => 0) do |nvim|
@@ -13,7 +13,7 @@ Neovim.plugin do |plug|
   end
 
   plug.command(:Log, :nargs => 0) do |nvim|
-    nvim.current.line = "logs: #{@received_messages}"
+    nvim.current.line = "logs: #{@log}"
   end
 
   # XXX :StackTrace - show the last stacktrace in @received_messages

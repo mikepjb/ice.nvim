@@ -17,7 +17,6 @@ module NreplClient
   end
 
   def send(code, log=[], nvim=:none)
-    include Bencode
     begin
       socket = TCPSocket.open('127.0.0.1', 9999)
       socket.sendmsg message('ice', session(socket, log), code)
