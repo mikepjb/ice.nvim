@@ -3,7 +3,6 @@ require_relative '../../lib/bencode'
 describe Bencode do
   include Bencode
 
-  # XXX strings should be abstracted into lets
   it 'can decode bencoded strings' do
     bencoded_string =
       "d2:id7:test-id"\
