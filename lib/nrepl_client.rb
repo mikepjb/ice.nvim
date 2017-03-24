@@ -13,7 +13,7 @@ def send(code, log=[])
   session = decoded["new-session"]
   session_length = decoded["new-session"].length
   socket.sendmsg "d4:code#{code.length}:#{code}2:id7:test-id2:op4:eval7:session#{session_length}:#{session}e"
-  return socket # XXX uncomment for test.rb
+  # return socket # XXX uncomment for test.rb
 
   catch (:complete) do
     while true
