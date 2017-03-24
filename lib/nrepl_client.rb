@@ -3,17 +3,30 @@ require_relative 'bencode'
 
 # XXX try catch when the connection is refused (repl is not running)
 # XXX should not send test-id, try using something else like test-running etc
+# XXX spec for nrepl client
+
+def session(socket, log=[])
+  socket.sendmsg 'd2:op5:clonee'
+  response = socket.recvmsg.first
+  decoded = Bencode::decode(response)
+  log << decoded
+  decoded["new-session"]
+end
+
+def message(id, session, code)
+  "d4:code"\
+  "#{code.length}:#{code}"\
+  "2:id"\
+  "#{id.length}:#{id}"\
+  "2:op4:eval"\
+  "7:session"\
+  "#{session.length}:#{session}e"
+end
 
 def send(code, log=[])
   include Bencode
   socket = TCPSocket.open('127.0.0.1', 9999)
-  socket.sendmsg 'd2:op5:clonee'
-  response = socket.recvmsg.first
-  decoded = Bencode::decode(response)
-  session = decoded["new-session"]
-  session_length = decoded["new-session"].length
-  socket.sendmsg "d4:code#{code.length}:#{code}2:id7:test-id2:op4:eval7:session#{session_length}:#{session}e"
-  # return socket # XXX uncomment for test.rb
+  socket.sendmsg message('ice', session(socket, log), code)
 
   catch (:complete) do
     while true
