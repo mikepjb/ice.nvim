@@ -47,7 +47,7 @@ Neovim.plugin do |plug|
     filename = nvim.get_current_buffer.name
     code_with_ns = prefix_namespace(filename, code)
     # nvim.echo(send(code_with_ns, @received_messages))
-    send(code_with_ns, @received_messages)
+    send(code_with_ns, @received_messages, nvim)
     catch (:complete) do
       @received_messages.reverse.each do |x|
         if x.has_key?('value')

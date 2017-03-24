@@ -23,10 +23,14 @@ def message(id, session, code)
   "#{session.length}:#{session}e"
 end
 
-def send(code, log=[])
+def send(code, log=[], nvim=:none)
   include Bencode
-  socket = TCPSocket.open('127.0.0.1', 9999)
-  socket.sendmsg message('ice', session(socket, log), code)
+  begin
+    socket = TCPSocket.open('127.0.0.1', 9999)
+    socket.sendmsg message('ice', session(socket, log), code)
+  rescue Errno::ECONNREFUSED
+    nvim.echo("There is no nREPL to connect to on port 9999")
+  end
 
   catch (:complete) do
     while true
