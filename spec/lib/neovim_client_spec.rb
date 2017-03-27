@@ -5,7 +5,7 @@ describe NeovimClient do
 
   it 'can parse inline ex command arguments' do
     expect(
-      parse_command_arguments(:nothing, ['(def goodvar 123)', 0, 0])
+      subject.parse_command_arguments(:nothing, ['(def goodvar 123)', 0, 0])
     ).to eq(
       '(def goodvar 123)'
     )

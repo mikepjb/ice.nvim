@@ -9,7 +9,7 @@ describe Bencode do
       "2:ns9:boot.user"\
       "7:session36:a647fb12-54ae-4313-8358-1161810de8f3"\
       "5:value17:#'boot.user/devile"
-    expect(decode(bencoded_string)).to eq(
+    expect(subject.decode(bencoded_string)).to eq(
       {"id" => "test-id",
        "ns" => "boot.user",
        "session" => "a647fb12-54ae-4313-8358-1161810de8f3",
@@ -22,7 +22,7 @@ describe Bencode do
                "ns" => "boot.user",
                "session" => "a647fb12-54ae-4313-8358-1161810de8f3",
                "value" => "#'boot.user/devil"}
-    expect(encode(message)).to eq(
+    expect(subject.encode(message)).to eq(
       "d2:id7:test-id"\
       "2:ns9:boot.user"\
       "7:session36:a647fb12-54ae-4313-8358-1161810de8f3"\
@@ -44,7 +44,7 @@ describe Bencode do
       "36:statusl4:done"\
       "e"\
       "e"
-    expect(decode_all(multi_dict_message)).to eq(
+    expect(subject.decode_all(multi_dict_message)).to eq(
       [{"id"=>"test-id", "ns"=>"watermarker.core", "session"=>"57fea508-bc66-42af-b167-a3469da03ec3", "value"=>"#'watermarker.core/this-method"},
        {"id"=>"test-id", "session"=>"57fea508-bc66-42af-b167-a3469da03ec3", "status"=>"done"}]
     )
@@ -56,7 +56,7 @@ describe Bencode do
       "2:ns9:boot.user"\
       "7:session36:a647fb12-54ae-4313-8358-1161810de8f3"\
       "5:value17:#'boot.user/devile"
-    expect(decode(single_dict_message)).to eq(
+    expect(subject.decode(single_dict_message)).to eq(
       {"id" => "test-id",
         "ns" => "boot.user",
         "session" => "a647fb12-54ae-4313-8358-1161810de8f3",
@@ -73,7 +73,7 @@ describe Bencode do
         "7:root-ex45:class clojure.lang.Compiler$CompilerException"\
         "7:session36:b9336d5c-abde-4dc3-b555-86628e3d26d6"\
         "6:statusl10:eval-erroree"
-      expect(decode_all(exception_message)).to eq(
+      expect(subject.decode_all(exception_message)).to eq(
         [{"ex" => "class clojure.lang.Compiler$CompilerException",
           "id" => "test-id",
           "root-ex" => "class clojure.lang.Compiler$CompilerException",
@@ -89,7 +89,7 @@ describe Bencode do
         "3:out244:             \e[1;31mjava.lang.RuntimeException\e[m: \e[3mNo such namespace: io\e[m\n\e[1;31mclojure.lang.Compiler$CompilerException\e[m: \e[3mjava.lang.RuntimeException: No such namespace: io, compiling:(/tmp/boot.user6662229202639790268.clj:2:86)\e[m\n"\
         "7:session36:b9336d5c-abde-4dc3-b555-86628e3d26d6"\
         "e"
-      expect(decode(detailed_exception_message)).to eq(
+      expect(subject.decode(detailed_exception_message)).to eq(
         {"id" => "test-id",
          "out" => "             \e[1;31mjava.lang.RuntimeException\e[m: \e[3mNo such namespace: io\e[m\n\e[1;31mclojure.lang.Compiler$CompilerException\e[m: \e[3mjava.lang.RuntimeException: No such namespace: io, compiling:(/tmp/boot.user6662229202639790268.clj:2:86)\e[m\n",
          "session" => "b9336d5c-abde-4dc3-b555-86628e3d26d6"}
@@ -99,7 +99,7 @@ describe Bencode do
 
   it 'extracts the next keypair in sequence' do
     expect(
-      extract_next_keypair(
+      subject.extract_next_keypair(
         {"cool" => "keypair"},
         "7:session36:b9336d5c-abde-4dc3-b555-86628e3d26d6e")
     ).to eq(
