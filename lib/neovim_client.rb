@@ -24,6 +24,24 @@ module NeovimClient
     code_to_evaluate.join("\n")
   end
 
+  # XXX unit test this, generalise with eval code
+  # XXX also make sure error is surfaced to neovim if filename not found
+  def self.require(nvim, log=[])
+    filename = nvim.get_current_buffer.name
+    send("(load-file \"#{filename}\")", log, nvim)
+
+    catch (:complete) do
+      log.reverse.each do |x|
+        if x.has_key?('value')
+          if !x['value'].empty?
+            nvim.echo(x['value'].gsub('"', '\"'))
+            throw :complete
+          end
+        end
+      end
+    end
+  end
+
   def self.eval(nvim, args, log=[])
     code = parse_command_arguments(nvim, args)
     filename = nvim.get_current_buffer.name

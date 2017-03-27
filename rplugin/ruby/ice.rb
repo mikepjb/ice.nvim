@@ -16,6 +16,9 @@ Neovim.plugin do |plug|
     nvim.current.line = "logs: #{@log}"
   end
 
+  plug.command(:Require, :nargs => 0) do |nvim|
+    NeovimClient::require(nvim, @log)
+  end
+
   # XXX :StackTrace - show the last stacktrace in @received_messages
-  # XXX :Require should use the load-file op - or maybe eval (load-file "currentfile")
 end
