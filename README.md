@@ -26,3 +26,9 @@ And via visual mode by calling `Eval` again
 
 ### Debugging
     `export NVIM_RUBY_LOG_FILE=~/helpful.log`
+
+### Feature Requests
+  - better display of the message log
+  - display error messages when they are returned in the ex command line
+  - run tests should run tests
+  - StackTrace should show the last stacktrace in the message log

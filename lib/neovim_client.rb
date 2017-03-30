@@ -51,10 +51,15 @@ module NeovimClient
     catch (:complete) do
       log.reverse.each do |x|
         if x.has_key?('value')
-          if !x['value'].empty?
-            nvim.echo(x['value'].gsub('"', '\"'))
-            throw :complete
-          end
+          nvim.echo(x['value'].gsub('"', '\"'))
+          throw :complete
+        elsif x.has_key?('out')
+          message = x['out'].
+            gsub('"', '\"').
+            gsub(/\e.*m/, '')
+          raise message
+          nvim.echo(message)
+          throw :complete
         end
       end
     end
