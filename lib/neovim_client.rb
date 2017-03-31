@@ -1,4 +1,5 @@
 require 'neovim'
+require 'tempfile'
 require_relative 'nrepl_client'
 require_relative 'message'
 
@@ -63,5 +64,16 @@ module NeovimClient
         end
       end
     end
+  end
+
+  # XXX tmp file should not stay on vim buffer list (like Gblame etc)
+  def self.log(nvim, log=[])
+    log_view = Tempfile.new('log_view')
+    log.each do |line|
+      log_view << "#{line}\n"
+    end
+    log_view.flush
+    nvim.command("below 15 split #{log_view.path}")
+    log_view.close
   end
 end

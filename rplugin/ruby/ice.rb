@@ -13,7 +13,7 @@ Neovim.plugin do |plug|
   end
 
   plug.command(:Log, :nargs => 0) do |nvim|
-    nvim.current.line = "logs: #{@log}"
+    NeovimClient::log(nvim, @log)
   end
 
   plug.command(:Require, :nargs => 0) do |nvim|
