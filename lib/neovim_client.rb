@@ -57,8 +57,11 @@ module NeovimClient
         elsif x.has_key?('out')
           message = x['out'].
             gsub('"', '\"').
-            gsub(/\e.*m/, '')
-          raise message
+            gsub(/\033\[(([0-9]?)\;?)+m/, '').
+            strip.
+            split("\n").
+            first
+          # XXX would be nice to use echoerr
           nvim.echo(message)
           throw :complete
         end
