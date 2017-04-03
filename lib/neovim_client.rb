@@ -3,7 +3,6 @@ require 'tempfile'
 require_relative 'nrepl_client'
 require_relative 'message'
 
-include NreplClient
 include Message
 
 module NeovimClient
@@ -29,7 +28,7 @@ module NeovimClient
   # XXX also make sure error is surfaced to neovim if filename not found
   def self.require(nvim, log=[])
     filename = nvim.get_current_buffer.name
-    send("(load-file \"#{filename}\")", log, nvim)
+    NreplClient::send("(load-file \"#{filename}\")", log, nvim)
 
     catch (:complete) do
       log.reverse.each do |x|
@@ -47,7 +46,7 @@ module NeovimClient
     code = parse_command_arguments(nvim, args)
     filename = nvim.get_current_buffer.name
     code_with_ns = Message::prefix_namespace(filename, code)
-    send(code_with_ns, log, nvim)
+    NreplClient::send(code_with_ns, log, nvim)
 
     catch (:complete) do
       log.reverse.each do |x|
