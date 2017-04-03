@@ -24,22 +24,35 @@ module NeovimClient
     code_to_evaluate.join("\n")
   end
 
-  # XXX unit test this, generalise with eval code
-  # XXX also make sure error is surfaced to neovim if filename not found
-  def self.require(nvim, log=[])
-    filename = nvim.get_current_buffer.name
-    NreplClient::send("(load-file \"#{filename}\")", log, nvim)
 
+  def self.clean_error(message)
+    message.gsub('"', '\"').
+      gsub(/\033\[(([0-9]?)\;?)+m/, '').
+      strip.
+      split("\n").
+      first
+  end
+
+  def self.output_response(nvim, log=[])
     catch (:complete) do
       log.reverse.each do |x|
         if x.has_key?('value')
-          if !x['value'].empty?
-            nvim.echo(x['value'].gsub('"', '\"'))
-            throw :complete
-          end
+          nvim.echo(x['value'].gsub('"', '\"'))
+          throw :complete
+        elsif x.has_key?('out')
+          # XXX would be nice to use echoerr
+          nvim.echo(clean_error(x['out']))
+          throw :complete
         end
       end
     end
+  end
+
+  # XXX unit test this
+  def self.require(nvim, log=[])
+    filename = nvim.get_current_buffer.name
+    NreplClient::send("(load-file \"#{filename}\")", log, nvim)
+    output_response(nvim, log)
   end
 
   def self.eval(nvim, args, log=[])
@@ -47,25 +60,7 @@ module NeovimClient
     filename = nvim.get_current_buffer.name
     code_with_ns = Message::prefix_namespace(filename, code)
     NreplClient::send(code_with_ns, log, nvim)
-
-    catch (:complete) do
-      log.reverse.each do |x|
-        if x.has_key?('value')
-          nvim.echo(x['value'].gsub('"', '\"'))
-          throw :complete
-        elsif x.has_key?('out')
-          message = x['out'].
-            gsub('"', '\"').
-            gsub(/\033\[(([0-9]?)\;?)+m/, '').
-            strip.
-            split("\n").
-            first
-          # XXX would be nice to use echoerr
-          nvim.echo(message)
-          throw :complete
-        end
-      end
-    end
+    output_response(nvim, log)
   end
 
   # XXX tmp file should not stay on vim buffer list (like Gblame etc)

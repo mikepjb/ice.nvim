@@ -2,7 +2,7 @@ require 'socket'
 require_relative 'bencode'
 
 module NreplClient
-  def session(socket, log=[])
+  def self.session(socket, log=[])
     socket.sendmsg 'd2:op5:clonee'
     response = socket.recvmsg.first
     decoded = Bencode::decode(response)
@@ -10,13 +10,13 @@ module NreplClient
     decoded["new-session"]
   end
 
-  def message(id, session, code)
+  def self.message(id, session, code)
     "d4:code#{code.length}:#{code}"\
     "2:id#{id.length}:#{id}"\
     "2:op4:eval7:session#{session.length}:#{session}e"
   end
 
-  def send(code, log=[], nvim=:none)
+  def self.send(code, log=[], nvim=:none)
     begin
       socket = TCPSocket.open('127.0.0.1', 9999)
       socket.sendmsg message('ice', session(socket, log), code)
@@ -35,7 +35,7 @@ module NreplClient
     end
   end
 
-  def run_tests(log=[])
+  def self.run_tests(log=[])
     send("(clojure.test/run-tests)", log)
   end
 end
