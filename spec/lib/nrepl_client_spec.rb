@@ -1,10 +1,9 @@
 require_relative '../../lib/nrepl_client'
 
 describe NreplClient do
-  include NreplClient
   it 'can construct a message' do
     expect(
-      message('an-id', 'a-session', '(important-function-to-call)')
+      NreplClient::message('an-id', 'a-session', '(important-function-to-call)')
     ).to eq(
       "d4:code"\
       "28:(important-function-to-call)"\
