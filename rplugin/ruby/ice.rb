@@ -8,17 +8,15 @@ Neovim.plugin do |plug|
     NeovimClient::eval(nvim, args, @log)
   end
 
-  plug.command(:RunTests, :nargs => 0) do |nvim|
-    nvim.echo(run_tests)
+  plug.command(:Require, :nargs => 0) do |nvim|
+    NeovimClient::require(nvim, @log)
   end
 
   plug.command(:Log, :nargs => 0) do |nvim|
     NeovimClient::log(nvim, @log)
   end
 
-  plug.command(:Require, :nargs => 0) do |nvim|
-    NeovimClient::require(nvim, @log)
+  plug.command(:Trace, :nargs => 0) do |nvim|
+    NeovimClient::trace(nvim, @log)
   end
-
-  # XXX :StackTrace - show the last stacktrace in @received_messages
 end

@@ -12,7 +12,7 @@ module NeovimClient
     end
   end
 
-  def self.parse_command_arguments(nvim, args) # unit test this
+  def self.parse_command_arguments(nvim, args) # XXX unit test this
     code_to_evaluate = []
     if args.length == 3
       code_to_evaluate << args[0]
@@ -24,13 +24,18 @@ module NeovimClient
     code_to_evaluate.join("\n")
   end
 
-
-  def self.clean_error(message)
+  def self.clean_error(message) # XXX combine clean error/trace
     message.gsub('"', '\"').
       gsub(/\033\[(([0-9]?)\;?)+m/, '').
       strip.
       split("\n").
       first
+  end
+
+  def self.clean_trace(message)
+    message.gsub('"', '\"').
+      gsub(/\033\[(([0-9]?)\;?)+m/, '').
+      strip
   end
 
   def self.output_response(nvim, log=[])
@@ -40,7 +45,6 @@ module NeovimClient
           nvim.echo(x['value'].gsub('"', '\"'))
           throw :complete
         elsif x.has_key?('out')
-          # XXX would be nice to use echoerr
           nvim.echo(clean_error(x['out']))
           throw :complete
         end
@@ -48,13 +52,14 @@ module NeovimClient
     end
   end
 
-  # XXX unit test this
-  def self.require(nvim, log=[])
+  def self.require(nvim, log=[]) # XXX unit test this
     filename = nvim.get_current_buffer.name
     NreplClient::send("(load-file \"#{filename}\")", log, nvim)
     output_response(nvim, log)
   end
 
+  # XXX stacktrace line numbers don't match up when evalling over load-file op
+  # update to use loadfile
   def self.eval(nvim, args, log=[])
     code = parse_command_arguments(nvim, args)
     filename = nvim.get_current_buffer.name
@@ -72,5 +77,22 @@ module NeovimClient
     log_view.flush
     nvim.command("below 15 split #{log_view.path}")
     log_view.close
+  end
+
+  # XXX this works but the line output is very long, shorten it
+  # XXX tmp file should not stay on vim buffer list (like Gblame etc)
+  def self.trace(nvim, log=[])
+    catch (:complete) do
+      log.reverse.each do |x|
+        if x.has_key?('out')
+          stack_trace_view = Tempfile.new('stack_trace_view')
+          stack_trace_view << clean_trace(x['out'])
+          stack_trace_view.flush
+          nvim.command("below 15 split #{stack_trace_view.path}")
+          stack_trace_view.close
+          throw :complete
+        end
+      end
+    end
   end
 end
